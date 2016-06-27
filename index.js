@@ -115,12 +115,14 @@ function parse(code, done) {
         // catch unsupported rules
         // console.log('unsupported', type)
       }
+      /* istanbul ignore else */
       else {
         // catch unsupported rules
         // console.log('unknown', type || 'rule')
       }
     })
   }
+  /* istanbul ignore else */
   else {
     // catch unsupported rules
     // console.log(ast)

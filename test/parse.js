@@ -25,6 +25,20 @@ describe('parse', function () {
     })
   })
 
+  it('parse transition', function (done) {
+    var code = '.foo {transition-property: margin-top; transition-duration: 300ms; transition-delay: 0.2s; transition-timing-function: ease-in;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({foo: {transitionProperty: 'marginTop', transitionDuration: 300, transitionDelay: 200, transitionTimingFunction: 'ease-in'}})
+      expect(data.log).eql([
+        {line: 1, column: 40, reason: 'NOTE: property value `300ms` is autofixed to `300`'},
+        {line: 1, column: 68, reason: 'NOTE: property value `0.2s` is autofixed to `200`'}
+      ])
+      done()
+    })
+  })
+
   it('parse and fix prop value', function (done) {
     var code = '.foo {font-size: 200px;}'
     styler.parse(code, function (err, data) {
