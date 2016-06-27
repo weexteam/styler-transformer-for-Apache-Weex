@@ -9,13 +9,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/alibaba/weex_transformer.git"
+    "url": "https://github.com/alibaba/weex_toolchain.git"
   },
   "keywords": [
     "weex"
   ],
   "author": "songsiqi <songsiqi2006@126.com>",
-  "license": "Apache",
+  "license": "GPL-3.0",
   "dependencies": {
     "css": "~2.2.1"
   },
