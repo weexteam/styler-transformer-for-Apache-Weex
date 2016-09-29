@@ -11,16 +11,6 @@ function extend(dest, src) {
   }
 }
 
-// ast: syntax error
-// ast: rule type
-// ast: selector format
-
-// content: prop name
-// content: prop value
-
-var SUPPORTED_AST_TYPE = ['stylesheet', 'rule', 'declaration']
-var IGNORED_AST_TYPE = ['comment', 'charset']
-var UNSUPPORTED_AST_TYPE = ['custom', 'document', 'font', 'host', 'import', 'keyframes', 'keyframe', 'media', 'namespace', 'page', 'supports']
 
 /**
  * Parse `<style>` code to a JSON Object and log errors & warnings
@@ -61,8 +51,6 @@ function parse(code, done) {
 
             /* istanbul ignore if */
             if (subType !== 'declaration') {
-              // catch unsupported rules
-              // console.log('sub type', subType)
               return
             }
 
@@ -118,25 +106,27 @@ function parse(code, done) {
           log = log.concat(ruleLog)
         }
       }
-      /* istanbul ignore else */
-      else if (IGNORED_AST_TYPE.indexOf(type) >= 0) {
-        // catch unsupported rules
-        // console.log('ignored', type)
-      }
-      /* istanbul ignore else */
-      else if (UNSUPPORTED_AST_TYPE.indexOf(type) >= 0) {
-        // catch unsupported rules
-        // console.log('unsupported', type)
-      }
-      else {
-        // catch unsupported rules
-        // console.log('unknown', type || 'rule')
+      else if (type === 'font-face') {
+        if (rule.declarations && rule.declarations.length) {
+          rule.declarations.forEach(function (declaration) {
+            /* istanbul ignore if */
+            if (declaration.type !== 'declaration') {
+              return
+            }
+            var name = util.hyphenedToCamelCase(declaration.property)
+            var value = declaration.value
+            if (name === 'fontFamily' && '\"\''.indexOf(value[0]) > -1) { // FIXME: delete leading and trailing quotes
+              value = value.slice(1, value.length - 1)
+            }
+            ruleResult[name] = value
+          })
+          if (!jsonStyle['@FONT-FACE']) {
+            jsonStyle['@FONT-FACE'] = []
+          }
+          jsonStyle['@FONT-FACE'].push(ruleResult)
+        }
       }
     })
-  }
-  else {
-    // catch unsupported rules
-    // console.log(ast)
   }
   done(err, {jsonStyle: jsonStyle, log: log})
 }

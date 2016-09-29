@@ -74,6 +74,21 @@ describe('parse', function () {
     })
   })
 
+  it('handle iconfont', function (done) {
+    var code = '@font-face {font-family: "font-family-name-1"; src: url("font file url 1-1") format("truetype");} @font-face {font-family: "font-family-name-2"; src: url("font file url 2-1") format("truetype"), url("font file url 2-2") format("woff");}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        '@FONT-FACE': [
+          {fontFamily: 'font-family-name-1', src: 'url("font file url 1-1") format("truetype")'},
+          {fontFamily: 'font-family-name-2', src: 'url("font file url 2-1") format("truetype"), url("font file url 2-2") format("woff")'}
+        ]
+      })
+      done()
+    })
+  })
+
   it('handle syntax error', function (done) {
     var code = 'asdf'
     styler.parse(code, function (err, data) {
