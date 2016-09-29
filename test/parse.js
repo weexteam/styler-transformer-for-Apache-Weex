@@ -59,6 +59,21 @@ describe('parse', function () {
     })
   })
 
+  it('handle pseudo class', function (done) {
+    var code = '.class-a {color: #0000ff;} .class-a:last-child:focus {color: #ff0000;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        'class-a': {
+          color: '#0000ff',
+          'color:last-child:focus': '#ff0000'
+        }
+      })
+      done()
+    })
+  })
+
   it('handle syntax error', function (done) {
     var code = 'asdf'
     styler.parse(code, function (err, data) {
