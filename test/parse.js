@@ -59,6 +59,21 @@ describe('parse', function () {
     })
   })
 
+  it('handle iconfont', function (done) {
+    var code = '@font-face {font-family: "font-family-name"; src: url("font file url1") format("truetype"), url("font file url2") format("woff"); }'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        '@FONT-FACE': {
+          fontFamily: 'font-family-name',
+          src: 'url("font file url1") format("truetype"), url("font file url2") format("woff")'
+        }
+      })
+      done()
+    })
+  })
+
   it('handle syntax error', function (done) {
     var code = 'asdf'
     styler.parse(code, function (err, data) {
