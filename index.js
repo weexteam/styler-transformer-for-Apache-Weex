@@ -85,8 +85,21 @@ function parse(code, done) {
 
           // catch unsupported selectors
           rule.selectors.forEach(function (selector) {
-            if (selector.match(/^\.[A-Za-z0-9_\-]+$/)) {
+            if (selector.match(/^\.[A-Za-z0-9_\-:]+$/)) {
               var className = selector.substr(1)
+
+              // handle pseudo class
+              var pseudoIndex = className.indexOf(':')
+              if (pseudoIndex > -1) {
+                var pseudoCls = className.slice(pseudoIndex)
+                className = className.slice(0, pseudoIndex)
+                var pseudoRuleResult = {}
+                Object.keys(ruleResult).forEach(function (prop) {
+                  pseudoRuleResult[prop + pseudoCls] = ruleResult[prop]
+                })
+                ruleResult = pseudoRuleResult
+              }
+
               if (!jsonStyle[className]) {
                 jsonStyle[className] = ruleResult
               }
