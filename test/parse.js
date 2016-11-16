@@ -9,17 +9,17 @@ var styler = require('../')
 describe('parse', function () {
 
   it('parse normal style code', function (done) {
-    var code = 'html {color: #000000;}\n\n.foo {color: red; background-color: rgba(255,255,255,0.6); -webkit-transform: rotate(90deg); width: 200px; left: 0; right: 0px}'
+    var code = 'html {color: #000000;}\n\n.foo {color: red; background-color: rgba(255,255,255,0.6); -webkit-transform: rotate(90deg); width: 200px; left: 0; right: 0px; borderWidth: 1pt;}'
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({foo: {color: '#FF0000', backgroundColor: 'rgba(255,255,255,0.6)', WebkitTransform: 'rotate(90deg)', width: 200, left: 0, right: 0}})
+      expect(data.jsonStyle).eql({foo: {color: '#FF0000', backgroundColor: 'rgba(255,255,255,0.6)', WebkitTransform: 'rotate(90deg)', width: 200, left: 0, right: 0, borderWidth: '1pt'}})
       expect(data.log).eql([
         {line: 1, column: 1, reason: 'ERROR: Selector `html` is not supported. Weex only support single-classname selector'},
         {line: 3, column: 7, reason: 'NOTE: property value `red` is autofixed to `#FF0000`'},
         {line: 3, column: 60, reason: 'WARNING: `-webkit-transform` is not a standard property name'},
-        {line: 3, column: 94, reason: 'NOTE: property value `200px` is autofixed to `200`'},
-        {line: 3, column: 117, reason: 'NOTE: property value `0px` is autofixed to `0`'}
+        {line: 3, column: 94, reason: 'NOTE: unit `px` is not supported and property value `200px` is autofixed to `200`'},
+        {line: 3, column: 117, reason: 'NOTE: unit `px` is not supported and property value `0px` is autofixed to `0`'}
       ])
       done()
     })
