@@ -1,6 +1,6 @@
 {
   "name": "weex-styler",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Weex <style> transformer",
   "main": "index.js",
   "scripts": {
