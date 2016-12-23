@@ -9,11 +9,11 @@ var styler = require('../')
 describe('parse', function () {
 
   it('parse normal style code', function (done) {
-    var code = 'html {color: #000000;}\n\n.foo {color: red; background-color: rgba(255,255,255,0.6); -webkit-transform: rotate(90deg); width: 200px; left: 0; right: 0px; borderWidth: 1pt;}'
+    var code = 'html {color: #000000;}\n\n.foo {color: red; background-color: rgba(255,255,255,0.6); -webkit-transform: rotate(90deg); width: 200px; left: 0; right: 0px; border-width: 1pt; font-weight: 100}'
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({foo: {color: '#FF0000', backgroundColor: 'rgba(255,255,255,0.6)', WebkitTransform: 'rotate(90deg)', width: 200, left: 0, right: 0, borderWidth: '1pt'}})
+      expect(data.jsonStyle).eql({foo: {color: '#FF0000', backgroundColor: 'rgba(255,255,255,0.6)', WebkitTransform: 'rotate(90deg)', width: 200, left: 0, right: 0, borderWidth: '1pt', fontWeight: '100'}})
       expect(data.log).eql([
         {line: 1, column: 1, reason: 'ERROR: Selector `html` is not supported. Weex only support single-classname selector'},
         {line: 3, column: 7, reason: 'NOTE: property value `red` is autofixed to `#FF0000`'},
