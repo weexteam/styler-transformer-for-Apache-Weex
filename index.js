@@ -6,9 +6,14 @@ var validateItem = require('./lib/validator').validate
 var css = require('css')
 
 function extend(dest, src) {
-  for (var i in src) {
-    dest[i] = src[i]
+  var ret = {}
+  for (var i in dest) {
+    ret[i] = dest[i]
   }
+  for (var i in src) {
+    ret[i] = src[i]
+  }
+  return ret
 }
 
 
@@ -92,7 +97,7 @@ function parse(code, done) {
                 jsonStyle[className] = ruleResult
               }
               else {
-                extend(jsonStyle[className], ruleResult)
+                jsonStyle[className] = extend(jsonStyle[className], ruleResult)
               }
             }
             else {

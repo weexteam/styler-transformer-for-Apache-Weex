@@ -46,6 +46,19 @@ describe('parse', function () {
   })
 
   it('handle complex class definition', function (done) {
+    var code = '.foo, .bar {font-size: 20;}\n\n .foo {color: #ff5000;}\n\n .bar {color: #000000;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        foo: {fontSize: 20, color: '#ff5000'},
+        bar: {fontSize: 20, color: '#000000'}
+      })
+      done()
+    })
+  })
+
+  it('handle more complex class definition', function (done) {
     var code = '.foo, .bar {font-size: 20; color: #000000}\n\n .foo, .bar, .baz {color: #ff5000; height: 30;}'
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
