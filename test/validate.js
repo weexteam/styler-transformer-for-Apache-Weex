@@ -245,6 +245,97 @@ describe('validate', function () {
     })
   })
 
+  it('parse transition-property', function (done) {
+    var code = {
+      foo: {
+        transitionProperty: 'margin-top'
+      },
+      bar: {
+        transitionProperty: 'height'
+      },
+      baz: {
+        transitionProperty: 'abc'
+      }
+    }
+    styler.validate(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        foo: {
+          transitionProperty: 'marginTop'
+        },
+        bar: {
+          transitionProperty: 'height'
+        },
+        baz: {}
+      })
+      expect(data.log).eql([
+        {reason: 'ERROR: property value `abc` is not supported for `transition-property` (only css property is valid)'}
+      ])
+      done()
+    })
+  })
+
+  it('parse transition-duration & transition-delay', function (done) {
+    var code = {
+      foo: {
+        transitionDuration: '200ms',
+        transitionDelay: '0.5s'
+      },
+      bar: {
+        transitionDuration: '200',
+        transitionDelay: 'abc'
+      }
+    }
+    styler.validate(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        foo: {
+          transitionDuration: '200ms',
+          transitionDelay: '0.5s'
+        },
+        bar: {}
+      })
+      expect(data.log).eql([
+        {reason: 'ERROR: property value `200` is not supported for `transition-duration` (only number of seconds and milliseconds is valid)'},
+        {reason: 'ERROR: property value `abc` is not supported for `transition-delay` (only number of seconds and milliseconds is valid)'}
+      ])
+      done()
+    })
+  })
+
+  it('parse transition-timing-function', function (done) {
+    var code = {
+      foo: {
+        transitionTimingFunction: 'ease-in-out'
+      },
+      bar: {
+        transitionTimingFunction: 'cubic-bezier(.88, 1.0, -0.67, 1.37)'
+      },
+      baz: {
+        transitionTimingFunction: 'abc'
+      }
+    }
+    styler.validate(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        foo: {
+          transitionTimingFunction: 'ease-in-out'
+        },
+        bar: {
+          transitionTimingFunction: 'cubic-bezier(0.88,1,-0.67,1.37)'
+        },
+        baz: {}
+      })
+      expect(data.log).eql([
+        {reason: 'ERROR: property value `abc` is not supported for `transition-timing-function` (supported values are: `linear`|`ease`|`ease-in`|`ease-out`|`ease-in-out`|`cubic-bezier(n,n,n,n)`)'}
+      ])
+      done()
+    })
+  })
+
   it('parse unknown', function (done) {
     var code = {
       foo: {

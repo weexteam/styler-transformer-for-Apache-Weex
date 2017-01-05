@@ -1,20 +1,8 @@
 'use strict'
 
+var css = require('css')
 var util = require('./lib/util')
 var validateItem = require('./lib/validator').validate
-
-var css = require('css')
-
-function extend(dest, src) {
-  var ret = {}
-  for (var i in dest) {
-    ret[i] = dest[i]
-  }
-  for (var i in src) {
-    ret[i] = src[i]
-  }
-  return ret
-}
 
 
 /**
@@ -76,10 +64,9 @@ function parse(code, done) {
             }
           })
 
-          // catch unsupported selectors
           rule.selectors.forEach(function (selector) {
             if (selector.match(/^\.[A-Za-z0-9_\-:]+$/)) {
-              var className = selector.substr(1)
+              var className = selector.slice(1)
 
               // handle pseudo class
               var pseudoIndex = className.indexOf(':')
@@ -93,12 +80,20 @@ function parse(code, done) {
                 ruleResult = pseudoRuleResult
               }
 
-              if (!jsonStyle[className]) {
-                jsonStyle[className] = ruleResult
-              }
-              else {
-                jsonStyle[className] = extend(jsonStyle[className], ruleResult)
-              }
+              // merge style
+              Object.keys(ruleResult).forEach(function (prop) {
+                if (prop.indexOf('transition') === 0) { // handle transition
+                  var realProp = prop.replace('transition', '')
+                  realProp = realProp[0].toLowerCase() + realProp.slice(1)
+                  jsonStyle['@TRANSITION'] = jsonStyle['@TRANSITION'] || {}
+                  jsonStyle['@TRANSITION'][className] = jsonStyle['@TRANSITION'][className] || {}
+                  jsonStyle['@TRANSITION'][className][realProp] = ruleResult[prop]
+                }
+                else {
+                  jsonStyle[className] = jsonStyle[className] || {}
+                  jsonStyle[className][prop] = ruleResult[prop]
+                }
+              })
             }
             else {
               log.push({
@@ -133,6 +128,7 @@ function parse(code, done) {
       }
     })
   }
+
   done(err, {jsonStyle: jsonStyle, log: log})
 }
 
