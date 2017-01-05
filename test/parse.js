@@ -25,17 +25,6 @@ describe('parse', function () {
     })
   })
 
-  it('parse transition', function (done) {
-    var code = '.foo {transition-property: margin-top; transition-duration: 300ms; transition-delay: 0.2s; transition-timing-function: ease-in;}'
-    styler.parse(code, function (err, data) {
-      expect(err).is.undefined
-      expect(data).is.an.object
-      expect(data.jsonStyle).eql({foo: {transitionProperty: 'marginTop', transitionDuration: '300ms', transitionDelay: '0.2s', transitionTimingFunction: 'ease-in'}})
-      expect(data.log).eql([])
-      done()
-    })
-  })
-
   it('parse and fix prop value', function (done) {
     var code = '.foo {font-size: 200px;}'
     styler.parse(code, function (err, data) {
@@ -79,6 +68,35 @@ describe('parse', function () {
         bar: {fontSize: 20, color: '#ff5000', height: 30},
         baz: {color: '#ff5000', height: 30}
       })
+      done()
+    })
+  })
+
+  it('parse transition', function (done) {
+    var code = '.foo {transition-property: margin-top; transition-duration: 300ms; transition-delay: 0.2s; transition-timing-function: ease-in;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({'@TRANSITION': {foo: {property: 'marginTop', duration: '300ms', delay: '0.2s', timingFunction: 'ease-in'}}})
+      expect(data.log).eql([])
+      done()
+    })
+  })
+
+  it('parse complex transition', function (done) {
+    var code = '.foo {font-size: 20; color: #000000}\n\n .foo, .bar {color: #ff5000; height: 30; transition-property: margin-top; transition-duration: 300ms; transition-delay: 0.2s; transition-timing-function: ease-in;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        '@TRANSITION': {
+          foo: {property: 'marginTop', duration: '300ms', delay: '0.2s', timingFunction: 'ease-in'},
+          bar: {property: 'marginTop', duration: '300ms', delay: '0.2s', timingFunction: 'ease-in'}
+        },
+        foo: {fontSize: 20, color: '#ff5000', height: 30},
+        bar: {color: '#ff5000', height: 30}
+      })
+      expect(data.log).eql([])
       done()
     })
   })
