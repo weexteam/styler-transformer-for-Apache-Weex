@@ -6,21 +6,16 @@ var validateItem = require('./lib/validator').validate
 var css = require('css')
 
 function extend(dest, src) {
-  for (var i in src) {
-    dest[i] = src[i]
+  var ret = {}
+  for (var i in dest) {
+    ret[i] = dest[i]
   }
+  for (var i in src) {
+    ret[i] = src[i]
+  }
+  return ret
 }
 
-// ast: syntax error
-// ast: rule type
-// ast: selector format
-
-// content: prop name
-// content: prop value
-
-var SUPPORTED_AST_TYPE = ['stylesheet', 'rule', 'declaration']
-var IGNORED_AST_TYPE = ['comment', 'charset']
-var UNSUPPORTED_AST_TYPE = ['custom', 'document', 'font', 'host', 'import', 'keyframes', 'keyframe', 'media', 'namespace', 'page', 'supports']
 
 /**
  * Parse `<style>` code to a JSON Object and log errors & warnings
@@ -61,8 +56,6 @@ function parse(code, done) {
 
             /* istanbul ignore if */
             if (subType !== 'declaration') {
-              // catch unsupported rules
-              // console.log('sub type', subType)
               return
             }
 
@@ -85,13 +78,26 @@ function parse(code, done) {
 
           // catch unsupported selectors
           rule.selectors.forEach(function (selector) {
-            if (selector.match(/^\.[A-Za-z0-9_\-]+$/)) {
+            if (selector.match(/^\.[A-Za-z0-9_\-:]+$/)) {
               var className = selector.substr(1)
+
+              // handle pseudo class
+              var pseudoIndex = className.indexOf(':')
+              if (pseudoIndex > -1) {
+                var pseudoCls = className.slice(pseudoIndex)
+                className = className.slice(0, pseudoIndex)
+                var pseudoRuleResult = {}
+                Object.keys(ruleResult).forEach(function (prop) {
+                  pseudoRuleResult[prop + pseudoCls] = ruleResult[prop]
+                })
+                ruleResult = pseudoRuleResult
+              }
+
               if (!jsonStyle[className]) {
                 jsonStyle[className] = ruleResult
               }
               else {
-                extend(jsonStyle[className], ruleResult)
+                jsonStyle[className] = extend(jsonStyle[className], ruleResult)
               }
             }
             else {
@@ -105,28 +111,29 @@ function parse(code, done) {
           log = log.concat(ruleLog)
         }
       }
-      /* istanbul ignore else */
-      else if (IGNORED_AST_TYPE.indexOf(type) >= 0) {
-        // catch unsupported rules
-        // console.log('ignored', type)
-      }
-      /* istanbul ignore else */
-      else if (UNSUPPORTED_AST_TYPE.indexOf(type) >= 0) {
-        // catch unsupported rules
-        // console.log('unsupported', type)
-      }
-      /* istanbul ignore else */
-      else {
-        // catch unsupported rules
-        // console.log('unknown', type || 'rule')
+      else if (type === 'font-face') {
+        if (rule.declarations && rule.declarations.length) {
+          rule.declarations.forEach(function (declaration) {
+            /* istanbul ignore if */
+            if (declaration.type !== 'declaration') {
+              return
+            }
+            var name = util.hyphenedToCamelCase(declaration.property)
+            var value = declaration.value
+            if (name === 'fontFamily' && '\"\''.indexOf(value[0]) > -1) { // FIXME: delete leading and trailing quotes
+              value = value.slice(1, value.length - 1)
+            }
+            ruleResult[name] = value
+          })
+          if (!jsonStyle['@FONT-FACE']) {
+            jsonStyle['@FONT-FACE'] = []
+          }
+          jsonStyle['@FONT-FACE'].push(ruleResult)
+        }
       }
     })
   }
-  /* istanbul ignore else */
-  else {
-    // catch unsupported rules
-    // console.log(ast)
-  }
+
   done(err, {jsonStyle: jsonStyle, log: log})
 }
 

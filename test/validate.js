@@ -31,7 +31,8 @@ describe('validate', function () {
       foo: {
         width: '200px',
         paddingLeft: '300',
-        margin: '10.5px',
+        margin: '10.5em',
+        borderWidth: '1pt',
         left: '0',
         right: '0px',
         marginRight: 'asdf'
@@ -44,13 +45,14 @@ describe('validate', function () {
         width: 200,
         paddingLeft: 300,
         margin: 10.5,
+        borderWidth: '1pt',
         left: 0,
         right: 0
       }})
       expect(data.log).eql([
-        {reason: 'NOTE: property value `200px` is autofixed to `200`'},
-        {reason: 'NOTE: property value `10.5px` is autofixed to `10.5`'},
-        {reason: 'NOTE: property value `0px` is autofixed to `0`'},
+        {reason: 'NOTE: unit `px` is not supported and property value `200px` is autofixed to `200`'},
+        {reason: 'NOTE: unit `em` is not supported and property value `10.5em` is autofixed to `10.5`'},
+        {reason: 'NOTE: unit `px` is not supported and property value `0px` is autofixed to `0`'},
         {reason: 'ERROR: property value `asdf` is not supported for `margin-right` (only number and pixel values are supported)'}
       ])
       done()
@@ -290,16 +292,13 @@ describe('validate', function () {
       expect(data).is.an.object
       expect(data.jsonStyle).eql({
         foo: {
-          transitionDuration: 200,
-          transitionDelay: 500
+          transitionDuration: '200ms',
+          transitionDelay: '0.5s'
         },
-        bar: {
-          transitionDuration: 200
-        }
+        bar: {}
       })
       expect(data.log).eql([
-        {reason: 'NOTE: property value `200ms` is autofixed to `200`'},
-        {reason: 'NOTE: property value `0.5s` is autofixed to `500`'},
+        {reason: 'ERROR: property value `200` is not supported for `transition-duration` (only number of seconds and milliseconds is valid)'},
         {reason: 'ERROR: property value `abc` is not supported for `transition-delay` (only number of seconds and milliseconds is valid)'}
       ])
       done()
@@ -341,6 +340,8 @@ describe('validate', function () {
     var code = {
       foo: {
         abc: '123',
+        def: '456px',
+        ghi: '789pt',
         AbcDef: '456',
         abcDef: 'abc'
       }
@@ -351,12 +352,16 @@ describe('validate', function () {
       expect(data.jsonStyle).eql({
         foo: {
           abc: 123,
+          def: 456,
+          ghi: '789pt',
           AbcDef: 456,
           abcDef: 'abc'
         }
       })
       expect(data.log).eql([
         {reason: 'WARNING: `abc` is not a standard property name'},
+        {reason: 'WARNING: `def` is not a standard property name'},
+        {reason: 'WARNING: `ghi` is not a standard property name'},
         {reason: 'WARNING: `-abc-def` is not a standard property name'},
         {reason: 'WARNING: `abc-def` is not a standard property name'}
       ])
@@ -379,7 +384,7 @@ describe('validate', function () {
       expect(data.log).eql([
         {reason: 'NOTE: property value `red` is autofixed to `#FF0000`'},
         {reason: 'WARNING: `-webkit-transform` is not a standard property name'},
-        {reason: 'NOTE: property value `200px` is autofixed to `200`'}
+        {reason: 'NOTE: unit `px` is not supported and property value `200px` is autofixed to `200`'}
       ])
       done()
     })

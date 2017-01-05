@@ -9,17 +9,17 @@ var styler = require('../')
 describe('parse', function () {
 
   it('parse normal style code', function (done) {
-    var code = 'html {color: #000000;}\n\n.foo {color: red; background-color: rgba(255,255,255,0.6); -webkit-transform: rotate(90deg); width: 200px; left: 0; right: 0px}'
+    var code = 'html {color: #000000;}\n\n.foo {color: red; background-color: rgba(255,255,255,0.6); -webkit-transform: rotate(90deg); width: 200px; left: 0; right: 0px; border-width: 1pt; font-weight: 100}'
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({foo: {color: '#FF0000', backgroundColor: 'rgba(255,255,255,0.6)', WebkitTransform: 'rotate(90deg)', width: 200, left: 0, right: 0}})
+      expect(data.jsonStyle).eql({foo: {color: '#FF0000', backgroundColor: 'rgba(255,255,255,0.6)', WebkitTransform: 'rotate(90deg)', width: 200, left: 0, right: 0, borderWidth: '1pt', fontWeight: '100'}})
       expect(data.log).eql([
         {line: 1, column: 1, reason: 'ERROR: Selector `html` is not supported. Weex only support single-classname selector'},
         {line: 3, column: 7, reason: 'NOTE: property value `red` is autofixed to `#FF0000`'},
         {line: 3, column: 60, reason: 'WARNING: `-webkit-transform` is not a standard property name'},
-        {line: 3, column: 94, reason: 'NOTE: property value `200px` is autofixed to `200`'},
-        {line: 3, column: 117, reason: 'NOTE: property value `0px` is autofixed to `0`'}
+        {line: 3, column: 94, reason: 'NOTE: unit `px` is not supported and property value `200px` is autofixed to `200`'},
+        {line: 3, column: 117, reason: 'NOTE: unit `px` is not supported and property value `0px` is autofixed to `0`'}
       ])
       done()
     })
@@ -30,11 +30,8 @@ describe('parse', function () {
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({foo: {transitionProperty: 'marginTop', transitionDuration: 300, transitionDelay: 200, transitionTimingFunction: 'ease-in'}})
-      expect(data.log).eql([
-        {line: 1, column: 40, reason: 'NOTE: property value `300ms` is autofixed to `300`'},
-        {line: 1, column: 68, reason: 'NOTE: property value `0.2s` is autofixed to `200`'}
-      ])
+      expect(data.jsonStyle).eql({foo: {transitionProperty: 'marginTop', transitionDuration: '300ms', transitionDelay: '0.2s', transitionTimingFunction: 'ease-in'}})
+      expect(data.log).eql([])
       done()
     })
   })
@@ -60,6 +57,19 @@ describe('parse', function () {
   })
 
   it('handle complex class definition', function (done) {
+    var code = '.foo, .bar {font-size: 20;}\n\n .foo {color: #ff5000;}\n\n .bar {color: #000000;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        foo: {fontSize: 20, color: '#ff5000'},
+        bar: {fontSize: 20, color: '#000000'}
+      })
+      done()
+    })
+  })
+
+  it('handle more complex class definition', function (done) {
     var code = '.foo, .bar {font-size: 20; color: #000000}\n\n .foo, .bar, .baz {color: #ff5000; height: 30;}'
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
@@ -68,6 +78,36 @@ describe('parse', function () {
         foo: {fontSize: 20, color: '#ff5000', height: 30},
         bar: {fontSize: 20, color: '#ff5000', height: 30},
         baz: {color: '#ff5000', height: 30}
+      })
+      done()
+    })
+  })
+
+  it('handle pseudo class', function (done) {
+    var code = '.class-a {color: #0000ff;} .class-a:last-child:focus {color: #ff0000;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        'class-a': {
+          color: '#0000ff',
+          'color:last-child:focus': '#ff0000'
+        }
+      })
+      done()
+    })
+  })
+
+  it('handle iconfont', function (done) {
+    var code = '@font-face {font-family: "font-family-name-1"; src: url("font file url 1-1") format("truetype");} @font-face {font-family: "font-family-name-2"; src: url("font file url 2-1") format("truetype"), url("font file url 2-2") format("woff");}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        '@FONT-FACE': [
+          {fontFamily: 'font-family-name-1', src: 'url("font file url 1-1") format("truetype")'},
+          {fontFamily: 'font-family-name-2', src: 'url("font file url 2-1") format("truetype"), url("font file url 2-2") format("woff")'}
+        ]
       })
       done()
     })
