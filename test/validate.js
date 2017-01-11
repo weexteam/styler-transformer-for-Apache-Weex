@@ -292,13 +292,16 @@ describe('validate', function () {
       expect(data).is.an.object
       expect(data.jsonStyle).eql({
         foo: {
-          transitionDuration: '200ms',
-          transitionDelay: '0.5s'
+          transitionDuration: 200,
+          transitionDelay: 500
         },
-        bar: {}
+        bar: {
+          transitionDuration: 200
+        }
       })
       expect(data.log).eql([
-        {reason: 'ERROR: property value `200` is not supported for `transition-duration` (only number of seconds and milliseconds is valid)'},
+        {reason: 'NOTE: property value `200ms` is autofixed to `200`'},
+        {reason: 'NOTE: property value `0.5s` is autofixed to `500`'},
         {reason: 'ERROR: property value `abc` is not supported for `transition-delay` (only number of seconds and milliseconds is valid)'}
       ])
       done()
