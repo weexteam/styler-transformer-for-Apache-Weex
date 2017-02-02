@@ -107,6 +107,25 @@ describe('parse', function () {
     })
   })
 
+  it('parse transition shorthand', function (done) {
+    var code = '.foo {font-size: 20; transition: margin-top 500ms ease-in-out 1s}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        '@TRANSITION': {
+          foo: {property: 'marginTop', duration: 500, delay: 1000, timingFunction: 'ease-in-out'},
+        },
+        foo: {fontSize: 20}
+      })
+      expect(data.log).eql([
+        {line: 1, column: 22, reason: 'NOTE: property value `500ms` is autofixed to `500`'},
+        {line: 1, column: 22, reason: 'NOTE: property value `1s` is autofixed to `1000`'}
+      ])
+      done()
+    })
+  })
+
   it('handle pseudo class', function (done) {
     var code = '.class-a {color: #0000ff;} .class-a:last-child:focus {color: #ff0000;}'
     styler.parse(code, function (err, data) {

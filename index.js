@@ -29,6 +29,7 @@ function parse(code, done) {
   }
 
   // walk all
+  /* istanbul ignore else */
   if (ast && ast.type === 'stylesheet' && ast.stylesheet &&
       ast.stylesheet.rules && ast.stylesheet.rules.length) {
     ast.stylesheet.rules.forEach(function (rule) {
@@ -38,6 +39,24 @@ function parse(code, done) {
 
       if (type === 'rule') {
         if (rule.declarations && rule.declarations.length) {
+          // transition shorthand parsing
+          var CHUNK_REGEXP = /^(\S*)?\s*(\d*\.?\d+(?:ms|s)?)?\s*(\S*)?\s*(\d*\.?\d+(?:ms|s)?)?$/
+          for (var i = 0; i < rule.declarations.length; i++) {
+            var declaration = rule.declarations[i]
+            if (declaration.property === 'transition') {
+              var match = declaration.value.match(CHUNK_REGEXP)
+              /* istanbul ignore else */
+              if (match) {
+                match[1] && rule.declarations.push({type: 'declaration', property: 'transition-property', value: match[1], position: declaration.position})
+                match[2] && rule.declarations.push({type: 'declaration', property: 'transition-duration', value: match[2], position: declaration.position})
+                match[3] && rule.declarations.push({type: 'declaration', property: 'transition-timing-function', value: match[3], position: declaration.position})
+                match[4] && rule.declarations.push({type: 'declaration', property: 'transition-delay', value: match[4], position: declaration.position})
+                rule.declarations.splice(i, 1)
+                break
+              }
+            }
+          }
+
           rule.declarations.forEach(function (declaration) {
             var subType = declaration.type
             var name, value, line, column, subResult, camelCasedName
@@ -54,6 +73,7 @@ function parse(code, done) {
             camelCasedName = util.hyphenedToCamelCase(name)
             subResult = validateItem(camelCasedName, value)
 
+            /* istanbul ignore else */
             if (typeof subResult.value === 'number' || typeof subResult.value === 'string') {
               ruleResult[camelCasedName] = subResult.value
             }
@@ -106,7 +126,9 @@ function parse(code, done) {
           log = log.concat(ruleLog)
         }
       }
+      /* istanbul ignore else */
       else if (type === 'font-face') {
+        /* istanbul ignore else */
         if (rule.declarations && rule.declarations.length) {
           rule.declarations.forEach(function (declaration) {
             /* istanbul ignore if */
