@@ -342,6 +342,7 @@ describe('validate', function () {
   it('parse unknown', function (done) {
     var code = {
       foo: {
+        background: '#ff0000',
         abc: '123',
         def: '456px',
         ghi: '789pt',
@@ -354,6 +355,7 @@ describe('validate', function () {
       expect(data).is.an.object
       expect(data.jsonStyle).eql({
         foo: {
+          background: '#ff0000',
           abc: 123,
           def: 456,
           ghi: '789pt',
@@ -362,11 +364,12 @@ describe('validate', function () {
         }
       })
       expect(data.log).eql([
-        {reason: 'WARNING: `abc` is not a standard property name'},
-        {reason: 'WARNING: `def` is not a standard property name'},
-        {reason: 'WARNING: `ghi` is not a standard property name'},
-        {reason: 'WARNING: `-abc-def` is not a standard property name'},
-        {reason: 'WARNING: `abc-def` is not a standard property name'}
+        {reason: 'WARNING: `background` is not a standard property name (may not be supported), suggest `background-color`'},
+        {reason: 'WARNING: `abc` is not a standard property name (may not be supported)'},
+        {reason: 'WARNING: `def` is not a standard property name (may not be supported)'},
+        {reason: 'WARNING: `ghi` is not a standard property name (may not be supported)'},
+        {reason: 'WARNING: `-abc-def` is not a standard property name (may not be supported)'},
+        {reason: 'WARNING: `abc-def` is not a standard property name (may not be supported)'}
       ])
       done()
     })
@@ -386,7 +389,7 @@ describe('validate', function () {
       expect(data.jsonStyle).eql({foo: {color: '#FF0000', WebkitTransform: 'rotate(90deg)', width: 200}})
       expect(data.log).eql([
         {reason: 'NOTE: property value `red` is autofixed to `#FF0000`'},
-        {reason: 'WARNING: `-webkit-transform` is not a standard property name'},
+        {reason: 'WARNING: `-webkit-transform` is not a standard property name (may not be supported)'},
         {reason: 'NOTE: unit `px` is not supported and property value `200px` is autofixed to `200`'}
       ])
       done()
