@@ -44,4 +44,135 @@ describe('shorthand-parser', function () {
       }
     ])
   })
+
+  it('parse margin', function () {
+    const declarations = [
+      {
+        type: 'declaration',
+        property: 'margin',
+        value: '1px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin',
+        value: '21px 22px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin',
+        value: '31px 32px 33px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin',
+        value: '41px 42px 43px 44px',
+        position: {}
+      }
+    ]
+    const result = shorthandParser(declarations)
+    expect(result).eql([
+      {
+        type: 'declaration',
+        property: 'margin-top',
+        value: '1px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-right',
+        value: '1px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-bottom',
+        value: '1px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-left',
+        value: '1px',
+        position: {}
+      },
+
+      {
+        type: 'declaration',
+        property: 'margin-top',
+        value: '21px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-right',
+        value: '22px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-bottom',
+        value: '21px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-left',
+        value: '22px',
+        position: {}
+      },
+
+      {
+        type: 'declaration',
+        property: 'margin-top',
+        value: '31px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-right',
+        value: '32px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-bottom',
+        value: '33px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-left',
+        value: '32px',
+        position: {}
+      },
+
+      {
+        type: 'declaration',
+        property: 'margin-top',
+        value: '41px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-right',
+        value: '42px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-bottom',
+        value: '43px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'margin-left',
+        value: '44px',
+        position: {}
+      }
+    ])
+  })
 })
