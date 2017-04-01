@@ -44,4 +44,135 @@ describe('shorthand-parser', function () {
       }
     ])
   })
+
+  it('parse padding', function () {
+    const declarations = [
+      {
+        type: 'declaration',
+        property: 'padding',
+        value: '1px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding',
+        value: '21px 22px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding',
+        value: '31px 32px 33px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding',
+        value: '41px 42px 43px 44px',
+        position: {}
+      }
+    ]
+    const result = shorthandParser(declarations)
+    expect(result).eql([
+      {
+        type: 'declaration',
+        property: 'padding-top',
+        value: '1px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-right',
+        value: '1px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-bottom',
+        value: '1px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-left',
+        value: '1px',
+        position: {}
+      },
+
+      {
+        type: 'declaration',
+        property: 'padding-top',
+        value: '21px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-right',
+        value: '22px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-bottom',
+        value: '21px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-left',
+        value: '22px',
+        position: {}
+      },
+
+      {
+        type: 'declaration',
+        property: 'padding-top',
+        value: '31px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-right',
+        value: '32px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-bottom',
+        value: '33px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-left',
+        value: '32px',
+        position: {}
+      },
+
+      {
+        type: 'declaration',
+        property: 'padding-top',
+        value: '41px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-right',
+        value: '42px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-bottom',
+        value: '43px',
+        position: {}
+      },
+      {
+        type: 'declaration',
+        property: 'padding-left',
+        value: '44px',
+        position: {}
+      }
+    ])
+  })
 })
