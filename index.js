@@ -102,7 +102,7 @@ function parse(code, done) {
 
               // merge style
               Object.keys(ruleResult).forEach(function (prop) {
-                if (prop.indexOf('transition') === 0) { // handle transition
+                if (prop.indexOf('transition') === 0 && prop !== 'transition') { // handle transition
                   var realProp = prop.replace('transition', '')
                   realProp = realProp[0].toLowerCase() + realProp.slice(1)
                   jsonStyle['@TRANSITION'] = jsonStyle['@TRANSITION'] || {}
