@@ -78,7 +78,7 @@ describe('parse', function () {
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({'@TRANSITION': {foo: {property: 'marginTop', duration: 300, delay: 200, timingFunction: 'ease-in'}}})
+      expect(data.jsonStyle['@TRANSITION']).eql({foo: {property: 'marginTop', duration: 300, delay: 200, timingFunction: 'ease-in'}})
       expect(data.log).eql([
         {line: 1, column: 40, reason: 'NOTE: property value `300ms` is autofixed to `300`'},
         {line: 1, column: 68, reason: 'NOTE: property value `0.2s` is autofixed to `200`'}
@@ -92,13 +92,23 @@ describe('parse', function () {
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({
-        '@TRANSITION': {
-          foo: {property: 'marginTop', duration: 300, delay: 200, timingFunction: 'ease-in'},
-          bar: {property: 'marginTop', duration: 300, delay: 200, timingFunction: 'ease-in'}
-        },
-        foo: {fontSize: 20, color: '#ff5000', height: 30},
-        bar: {color: '#ff5000', height: 30}
+      expect(data.jsonStyle['@TRANSITION']).eql({
+        foo: {property: 'marginTop', duration: 300, delay: 200, timingFunction: 'ease-in'},
+        bar: {property: 'marginTop', duration: 300, delay: 200, timingFunction: 'ease-in'}
+      })
+      expect(data.jsonStyle.foo).eql({
+        fontSize: 20, color: '#ff5000', height: 30,
+        transitionDelay: 200,
+        transitionDuration: 300,
+        transitionProperty: "marginTop",
+        transitionTimingFunction: "ease-in"
+      })
+      expect(data.jsonStyle.bar).eql({
+        color: '#ff5000', height: 30,
+        transitionDelay: 200,
+        transitionDuration: 300,
+        transitionProperty: "marginTop",
+        transitionTimingFunction: "ease-in"
       })
       expect(data.log).eql([
         {line: 3, column: 75, reason: 'NOTE: property value `300ms` is autofixed to `300`'},
@@ -113,11 +123,13 @@ describe('parse', function () {
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({
-        '@TRANSITION': {
-          foo: {property: 'marginTop', duration: 500, delay: 1000, timingFunction: 'ease-in-out'},
-        },
-        foo: {fontSize: 20}
+      expect(data.jsonStyle['@TRANSITION']).eql({foo: {property: 'marginTop', duration: 500, delay: 1000, timingFunction: 'ease-in-out' }})
+      expect(data.jsonStyle.foo).eql({
+        fontSize: 20,
+        transitionDelay: 1000,
+        transitionDuration: 500,
+        transitionProperty: "marginTop",
+        transitionTimingFunction: "ease-in-out"
       })
       expect(data.log).eql([
         {line: 1, column: 22, reason: 'NOTE: property value `500ms` is autofixed to `500`'},

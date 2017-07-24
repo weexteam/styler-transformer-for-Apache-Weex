@@ -102,17 +102,18 @@ function parse(code, done) {
 
               // merge style
               Object.keys(ruleResult).forEach(function (prop) {
-                if (prop.indexOf('transition') === 0) { // handle transition
+
+                // handle transition
+                if (prop.indexOf('transition') === 0) {
                   var realProp = prop.replace('transition', '')
                   realProp = realProp[0].toLowerCase() + realProp.slice(1)
                   jsonStyle['@TRANSITION'] = jsonStyle['@TRANSITION'] || {}
                   jsonStyle['@TRANSITION'][className] = jsonStyle['@TRANSITION'][className] || {}
                   jsonStyle['@TRANSITION'][className][realProp] = ruleResult[prop]
                 }
-                else {
-                  jsonStyle[className] = jsonStyle[className] || {}
-                  jsonStyle[className][prop] = ruleResult[prop]
-                }
+
+                jsonStyle[className] = jsonStyle[className] || {}
+                jsonStyle[className][prop] = ruleResult[prop]
               })
             }
             else {
