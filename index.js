@@ -4,6 +4,25 @@ var css = require('css')
 var util = require('./lib/util')
 var validateItem = require('./lib/validator').validate
 
+// padding & margin shorthand parsing
+function convertLengthShorthand (rule, prop) {
+  for (var i = 0; i < rule.declarations.length; i++) {
+    var declaration = rule.declarations[i]
+    if (declaration.property === prop) {
+      var values =  declaration.value.split(/\s+/)
+      // values[0] = values[0] || 0
+      values[1] = values[1] || values[0]
+      values[2] = values[2] || values[0]
+      values[3] = values[3] || values[1]
+      rule.declarations.splice(i, 1)
+      rule.declarations.splice(i, 0, {type: 'declaration', property: prop + '-left', value: values[3], position: declaration.position})
+      rule.declarations.splice(i, 0, {type: 'declaration', property: prop + '-bottom', value: values[2], position: declaration.position})
+      rule.declarations.splice(i, 0, {type: 'declaration', property: prop + '-right', value: values[1], position: declaration.position})
+      rule.declarations.splice(i, 0, {type: 'declaration', property: prop + '-top', value: values[0], position: declaration.position})
+      // break
+    }
+  }
+}
 
 /**
  * Parse `<style>` code to a JSON Object and log errors & warnings
@@ -47,15 +66,19 @@ function parse(code, done) {
               var match = declaration.value.match(CHUNK_REGEXP)
               /* istanbul ignore else */
               if (match) {
+                rule.declarations.splice(i, 1)
                 match[1] && rule.declarations.push({type: 'declaration', property: 'transition-property', value: match[1], position: declaration.position})
                 match[2] && rule.declarations.push({type: 'declaration', property: 'transition-duration', value: match[2], position: declaration.position})
                 match[3] && rule.declarations.push({type: 'declaration', property: 'transition-timing-function', value: match[3], position: declaration.position})
                 match[4] && rule.declarations.push({type: 'declaration', property: 'transition-delay', value: match[4], position: declaration.position})
-                rule.declarations.splice(i, 1)
                 break
               }
             }
           }
+
+          // padding & margin shorthand parsing
+          convertLengthShorthand(rule, 'padding')
+          convertLengthShorthand(rule, 'margin')
 
           rule.declarations.forEach(function (declaration) {
             var subType = declaration.type

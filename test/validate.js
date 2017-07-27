@@ -31,7 +31,6 @@ describe('validate', function () {
       foo: {
         width: '200px',
         paddingLeft: '300',
-        margin: '10.5em',
         borderWidth: '1pt',
         left: '0',
         right: '0px',
@@ -44,14 +43,12 @@ describe('validate', function () {
       expect(data.jsonStyle).eql({foo: {
         width: 200,
         paddingLeft: 300,
-        margin: 10.5,
         borderWidth: '1pt',
         left: 0,
         right: 0
       }})
       expect(data.log).eql([
         {reason: 'NOTE: unit `px` is not supported and property value `200px` is autofixed to `200`'},
-        {reason: 'NOTE: unit `em` is not supported and property value `10.5em` is autofixed to `10.5`'},
         {reason: 'NOTE: unit `px` is not supported and property value `0px` is autofixed to `0`'},
         {reason: 'ERROR: property value `asdf` is not supported for `margin-right` (only number and pixel values are supported)'}
       ])

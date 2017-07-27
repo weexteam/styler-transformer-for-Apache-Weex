@@ -161,6 +161,56 @@ describe('parse', function () {
     })
   })
 
+  it('parse padding & margin shorthand', function (done) {
+    var code = '.foo { padding: 20px; margin: 30px 40; } .bar { margin: 10px 20 30; padding: 10 20px 30px 40;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle.foo).eql({
+        paddingTop: 20,
+        paddingRight: 20,
+        paddingBottom: 20,
+        paddingLeft: 20,
+        marginTop: 30,
+        marginRight: 40,
+        marginBottom: 30,
+        marginLeft: 40
+      })
+      expect(data.jsonStyle.bar).eql({
+        paddingTop: 10,
+        paddingRight: 20,
+        paddingBottom: 30,
+        paddingLeft: 40,
+        marginTop: 10,
+        marginRight: 20,
+        marginBottom: 30,
+        marginLeft: 20
+      })
+      done()
+    })
+  })
+
+  it('override padding & margin shorthand', function (done) {
+    var code = '.foo { padding: 20px; padding-left: 30px; } .bar { margin: 10px 20; margin-bottom: 30px;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle.foo).eql({
+        paddingTop: 20,
+        paddingRight: 20,
+        paddingBottom: 20,
+        paddingLeft: 30
+      })
+      expect(data.jsonStyle.bar).eql({
+        marginTop: 10,
+        marginRight: 20,
+        marginBottom: 30,
+        marginLeft: 20
+      })
+      done()
+    })
+  })
+
   it('handle pseudo class', function (done) {
     var code = '.class-a {color: #0000ff;} .class-a:last-child:focus {color: #ff0000;}'
     styler.parse(code, function (err, data) {
