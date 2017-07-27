@@ -253,6 +253,9 @@ describe('validate', function () {
       bar: {
         transitionProperty: 'height'
       },
+      foobar: {
+        transitionProperty: 'margin-top, height'
+      },
       baz: {
         transitionProperty: 'abc'
       }
@@ -266,6 +269,9 @@ describe('validate', function () {
         },
         bar: {
           transitionProperty: 'height'
+        },
+        foobar: {
+          transitionProperty: 'marginTop,height'
         },
         baz: {}
       })
