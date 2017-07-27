@@ -67,10 +67,10 @@ function parse(code, done) {
               /* istanbul ignore else */
               if (match) {
                 rule.declarations.splice(i, 1)
-                match[1] && rule.declarations.push({type: 'declaration', property: 'transition-property', value: match[1], position: declaration.position})
-                match[2] && rule.declarations.push({type: 'declaration', property: 'transition-duration', value: match[2], position: declaration.position})
-                match[3] && rule.declarations.push({type: 'declaration', property: 'transition-timing-function', value: match[3], position: declaration.position})
-                match[4] && rule.declarations.push({type: 'declaration', property: 'transition-delay', value: match[4], position: declaration.position})
+                match[4] && rule.declarations.push(i, 0, {type: 'declaration', property: 'transition-delay', value: match[4], position: declaration.position})
+                match[3] && rule.declarations.push(i, 0, {type: 'declaration', property: 'transition-timing-function', value: match[3], position: declaration.position})
+                match[2] && rule.declarations.push(i, 0, {type: 'declaration', property: 'transition-duration', value: match[2], position: declaration.position})
+                match[1] && rule.declarations.push(i, 0, {type: 'declaration', property: 'transition-property', value: match[1], position: declaration.position})
                 break
               }
             }

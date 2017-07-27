@@ -154,9 +154,26 @@ describe('parse', function () {
         transitionTimingFunction: "ease-in-out"
       })
       expect(data.log).eql([
-        {line: 1, column: 22, reason: 'NOTE: property value `500ms` is autofixed to `500`'},
-        {line: 1, column: 22, reason: 'NOTE: property value `1s` is autofixed to `1000`'}
+        {line: 1, column: 22, reason: 'NOTE: property value `1s` is autofixed to `1000`'},
+        {line: 1, column: 22, reason: 'NOTE: property value `500ms` is autofixed to `500`'}
       ])
+      done()
+    })
+  })
+
+  it.skip('override transition shorthand', function (done) {
+    var code = '.foo {font-size: 32px; transition: margin-top 500ms ease-in-out 1s; transition-duration: 300ms}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle['@TRANSITION']).eql({foo: {property: 'marginTop', duration: 300, delay: 1000, timingFunction: 'ease-in-out' }})
+      expect(data.jsonStyle.foo).eql({
+        fontSize: 32,
+        transitionDelay: 1000,
+        transitionDuration: 300,
+        transitionProperty: "marginTop",
+        transitionTimingFunction: "ease-in-out"
+      })
       done()
     })
   })
