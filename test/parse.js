@@ -93,6 +93,22 @@ describe('parse', function () {
     })
   })
 
+  it('parse transition transform', function (done) {
+    var code = '.foo {transition-property: transform; transition-duration: 300ms; transition-delay: 0.2s; transition-timing-function: ease-in-out;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle['@TRANSITION']).eql({foo: {property: 'transform', duration: 300, delay: 200, timingFunction: 'ease-in-out'}})
+      expect(data.jsonStyle.foo).eql({
+        transitionDelay: 200,
+        transitionDuration: 300,
+        transitionProperty: "transform",
+        transitionTimingFunction: "ease-in-out"
+      })
+      done()
+    })
+  })
+
   it('parse multi transition properties', function (done) {
     var code = '.foo {transition-property: margin-top, height; transition-duration: 300ms; transition-delay: 0.2s; transition-timing-function: ease-in-out;}'
     styler.parse(code, function (err, data) {
