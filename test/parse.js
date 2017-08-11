@@ -79,10 +79,48 @@ describe('parse', function () {
       expect(err).is.undefined
       expect(data).is.an.object
       expect(data.jsonStyle['@TRANSITION']).eql({foo: {property: 'marginTop', duration: 300, delay: 200, timingFunction: 'ease-in'}})
+      expect(data.jsonStyle.foo).eql({
+        transitionDelay: 200,
+        transitionDuration: 300,
+        transitionProperty: "marginTop",
+        transitionTimingFunction: "ease-in"
+      })
       expect(data.log).eql([
         {line: 1, column: 40, reason: 'NOTE: property value `300ms` is autofixed to `300`'},
         {line: 1, column: 68, reason: 'NOTE: property value `0.2s` is autofixed to `200`'}
       ])
+      done()
+    })
+  })
+
+  it('parse transition transform', function (done) {
+    var code = '.foo {transition-property: transform; transition-duration: 300ms; transition-delay: 0.2s; transition-timing-function: ease-in-out;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle['@TRANSITION']).eql({foo: {property: 'transform', duration: 300, delay: 200, timingFunction: 'ease-in-out'}})
+      expect(data.jsonStyle.foo).eql({
+        transitionDelay: 200,
+        transitionDuration: 300,
+        transitionProperty: "transform",
+        transitionTimingFunction: "ease-in-out"
+      })
+      done()
+    })
+  })
+
+  it('parse multi transition properties', function (done) {
+    var code = '.foo {transition-property: margin-top, height; transition-duration: 300ms; transition-delay: 0.2s; transition-timing-function: ease-in-out;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle['@TRANSITION']).eql({foo: {property: 'marginTop,height', duration: 300, delay: 200, timingFunction: 'ease-in-out'}})
+      expect(data.jsonStyle.foo).eql({
+        transitionDelay: 200,
+        transitionDuration: 300,
+        transitionProperty: "marginTop,height",
+        transitionTimingFunction: "ease-in-out"
+      })
       done()
     })
   })
@@ -132,9 +170,76 @@ describe('parse', function () {
         transitionTimingFunction: "ease-in-out"
       })
       expect(data.log).eql([
-        {line: 1, column: 22, reason: 'NOTE: property value `500ms` is autofixed to `500`'},
-        {line: 1, column: 22, reason: 'NOTE: property value `1s` is autofixed to `1000`'}
+        {line: 1, column: 22, reason: 'NOTE: property value `1s` is autofixed to `1000`'},
+        {line: 1, column: 22, reason: 'NOTE: property value `500ms` is autofixed to `500`'}
       ])
+      done()
+    })
+  })
+
+  it.skip('override transition shorthand', function (done) {
+    var code = '.foo {font-size: 32px; transition: margin-top 500ms ease-in-out 1s; transition-duration: 300ms}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle['@TRANSITION']).eql({foo: {property: 'marginTop', duration: 300, delay: 1000, timingFunction: 'ease-in-out' }})
+      expect(data.jsonStyle.foo).eql({
+        fontSize: 32,
+        transitionDelay: 1000,
+        transitionDuration: 300,
+        transitionProperty: "marginTop",
+        transitionTimingFunction: "ease-in-out"
+      })
+      done()
+    })
+  })
+
+  it('parse padding & margin shorthand', function (done) {
+    var code = '.foo { padding: 20px; margin: 30px 40; } .bar { margin: 10px 20 30; padding: 10 20px 30px 40;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle.foo).eql({
+        paddingTop: 20,
+        paddingRight: 20,
+        paddingBottom: 20,
+        paddingLeft: 20,
+        marginTop: 30,
+        marginRight: 40,
+        marginBottom: 30,
+        marginLeft: 40
+      })
+      expect(data.jsonStyle.bar).eql({
+        paddingTop: 10,
+        paddingRight: 20,
+        paddingBottom: 30,
+        paddingLeft: 40,
+        marginTop: 10,
+        marginRight: 20,
+        marginBottom: 30,
+        marginLeft: 20
+      })
+      done()
+    })
+  })
+
+  it('override padding & margin shorthand', function (done) {
+    var code = '.foo { padding: 20px; padding-left: 30px; } .bar { margin: 10px 20; margin-bottom: 30px;}'
+    styler.parse(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle.foo).eql({
+        paddingTop: 20,
+        paddingRight: 20,
+        paddingBottom: 20,
+        paddingLeft: 30
+      })
+      expect(data.jsonStyle.bar).eql({
+        marginTop: 10,
+        marginRight: 20,
+        marginBottom: 30,
+        marginLeft: 20
+      })
       done()
     })
   })
