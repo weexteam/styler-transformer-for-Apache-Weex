@@ -5,6 +5,25 @@ var util = require('./lib/util')
 var validateItem = require('./lib/validator').validate
 var shorthandParser = require('./lib/shorthand-parser')
 
+// padding & margin shorthand parsing
+function convertLengthShorthand (rule, prop) {
+  for (var i = 0; i < rule.declarations.length; i++) {
+    var declaration = rule.declarations[i]
+    if (declaration.property === prop) {
+      var values =  declaration.value.split(/\s+/)
+      // values[0] = values[0] || 0
+      values[1] = values[1] || values[0]
+      values[2] = values[2] || values[0]
+      values[3] = values[3] || values[1]
+      rule.declarations.splice(i, 1)
+      rule.declarations.splice(i, 0, {type: 'declaration', property: prop + '-left', value: values[3], position: declaration.position})
+      rule.declarations.splice(i, 0, {type: 'declaration', property: prop + '-bottom', value: values[2], position: declaration.position})
+      rule.declarations.splice(i, 0, {type: 'declaration', property: prop + '-right', value: values[1], position: declaration.position})
+      rule.declarations.splice(i, 0, {type: 'declaration', property: prop + '-top', value: values[0], position: declaration.position})
+      // break
+    }
+  }
+}
 
 /**
  * Parse `<style>` code to a JSON Object and log errors & warnings
@@ -41,6 +60,9 @@ function parse(code, done) {
       if (type === 'rule') {
         if (rule.declarations && rule.declarations.length) {
           rule.declarations = shorthandParser(rule.declarations)
+          // padding & margin shorthand parsing
+          convertLengthShorthand(rule, 'padding')
+          convertLengthShorthand(rule, 'margin')
 
           rule.declarations.forEach(function (declaration) {
             var subType = declaration.type
@@ -87,17 +109,17 @@ function parse(code, done) {
 
               // merge style
               Object.keys(ruleResult).forEach(function (prop) {
-                if (prop.indexOf('transition') === 0) { // handle transition
+                // handle transition
+                if (prop.indexOf('transition') === 0 && prop !== 'transition') {
                   var realProp = prop.replace('transition', '')
                   realProp = realProp[0].toLowerCase() + realProp.slice(1)
                   jsonStyle['@TRANSITION'] = jsonStyle['@TRANSITION'] || {}
                   jsonStyle['@TRANSITION'][className] = jsonStyle['@TRANSITION'][className] || {}
                   jsonStyle['@TRANSITION'][className][realProp] = ruleResult[prop]
                 }
-                else {
-                  jsonStyle[className] = jsonStyle[className] || {}
-                  jsonStyle[className][prop] = ruleResult[prop]
-                }
+
+                jsonStyle[className] = jsonStyle[className] || {}
+                jsonStyle[className][prop] = ruleResult[prop]
               })
             }
             else {
