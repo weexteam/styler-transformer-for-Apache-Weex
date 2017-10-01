@@ -3,6 +3,7 @@
 var css = require('css')
 var util = require('./lib/util')
 var validateItem = require('./lib/validator').validate
+var shorthandParser = require('./lib/shorthand-parser')
 
 // padding & margin shorthand parsing
 function convertLengthShorthand (rule, prop) {
@@ -58,24 +59,7 @@ function parse(code, done) {
 
       if (type === 'rule') {
         if (rule.declarations && rule.declarations.length) {
-          // transition shorthand parsing
-          var CHUNK_REGEXP = /^(\S*)?\s*(\d*\.?\d+(?:ms|s)?)?\s*(\S*)?\s*(\d*\.?\d+(?:ms|s)?)?$/
-          for (var i = 0; i < rule.declarations.length; i++) {
-            var declaration = rule.declarations[i]
-            if (declaration.property === 'transition') {
-              var match = declaration.value.match(CHUNK_REGEXP)
-              /* istanbul ignore else */
-              if (match) {
-                rule.declarations.splice(i, 1)
-                match[4] && rule.declarations.push(i, 0, {type: 'declaration', property: 'transition-delay', value: match[4], position: declaration.position})
-                match[3] && rule.declarations.push(i, 0, {type: 'declaration', property: 'transition-timing-function', value: match[3], position: declaration.position})
-                match[2] && rule.declarations.push(i, 0, {type: 'declaration', property: 'transition-duration', value: match[2], position: declaration.position})
-                match[1] && rule.declarations.push(i, 0, {type: 'declaration', property: 'transition-property', value: match[1], position: declaration.position})
-                break
-              }
-            }
-          }
-
+          rule.declarations = shorthandParser(rule.declarations)
           // padding & margin shorthand parsing
           convertLengthShorthand(rule, 'padding')
           convertLengthShorthand(rule, 'margin')
