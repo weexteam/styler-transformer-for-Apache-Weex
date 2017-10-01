@@ -170,8 +170,8 @@ describe('parse', function () {
         transitionTimingFunction: "ease-in-out"
       })
       expect(data.log).eql([
-        {line: 1, column: 22, reason: 'NOTE: property value `1s` is autofixed to `1000`'},
-        {line: 1, column: 22, reason: 'NOTE: property value `500ms` is autofixed to `500`'}
+        {line: 1, column: 22, reason: 'NOTE: property value `500ms` is autofixed to `500`'},
+        {line: 1, column: 22, reason: 'NOTE: property value `1s` is autofixed to `1000`'}
       ])
       done()
     })

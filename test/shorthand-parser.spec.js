@@ -8,7 +8,7 @@ var shorthandParser = require('../lib/shorthand-parser')
 
 describe('shorthand-parser', function () {
   it('parse transition', function () {
-    const declarations = [
+    var declarations = [
       {
         type: 'declaration',
         property: 'transition',
@@ -16,7 +16,7 @@ describe('shorthand-parser', function () {
         position: {}
       }
     ]
-    const result = shorthandParser(declarations)
+    var result = shorthandParser(declarations)
     expect(result).eql([
       {
         type: 'declaration',
@@ -46,7 +46,7 @@ describe('shorthand-parser', function () {
   })
 
   it('parse margin', function () {
-    const declarations = [
+    var declarations = [
       {
         type: 'declaration',
         property: 'margin',
@@ -72,7 +72,7 @@ describe('shorthand-parser', function () {
         position: {}
       }
     ]
-    const result = shorthandParser(declarations)
+    var result = shorthandParser(declarations)
     expect(result).eql([
       {
         type: 'declaration',
