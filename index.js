@@ -87,6 +87,7 @@ function parse(code, done) {
             if (subResult.log) {
               subResult.log.line = declaration.position.start.line
               subResult.log.column = declaration.position.start.column
+              subResult.log.selectors = rule.selectors.join(', ')
               ruleLog.push(subResult.log)
             }
           })
