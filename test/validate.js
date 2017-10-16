@@ -204,19 +204,31 @@ describe('validate', function () {
     })
   })
 
-  it('parse enum', function (done) {
+  it('parse color', function (done) {
     var code = {
       foo: {
-        position: 'absolute'
+        color: '#FF0000',
+        backgroundColor: '#ff0000'
       },
       bar: {
-        position: 'relative'
+        color: '#F00',
+        backgroundColor: '#f00'
       },
       baz: {
-        position: 'fixed'
+        color: 'red',
+        backgroundColor: 'lightpink'
       },
-      boo: {
-        position: ''
+      rgba: {
+        color: 'rgb(23, 0, 255)',
+        backgroundColor: 'rgba(234, 45, 99, .4)'
+      },
+      transparent: {
+        color: 'transparent',
+        backgroundColor: 'asdf'
+      },
+      errRgba: {
+        color: 'rgb(266,0,255)',
+        backgroundColor: 'rgba(234,45,99,1.3)'
       }
     }
     styler.validate(code, function (err, data) {
@@ -224,19 +236,54 @@ describe('validate', function () {
       expect(data).is.an.object
       expect(data.jsonStyle).eql({
         foo: {
-          position: 'absolute'
+          color: '#FF0000',
+          backgroundColor: '#ff0000'
         },
         bar: {
-          position: 'relative'
+          color: '#FF0000',
+          backgroundColor: '#ff0000'
         },
         baz: {
-          position: 'fixed'
+          color: '#FF0000',
+          backgroundColor: '#FFB6C1'
         },
-        boo: {}
+        rgba: {
+          color: 'rgb(23,0,255)',
+          backgroundColor: 'rgba(234,45,99,0.4)'
+        },
+        transparent: {
+          color: 'rgba(0,0,0,0)'
+        },
+        errRgba: {}
       })
       expect(data.log).eql([
-        {reason: 'NOTE: property value `relative` is the DEFAULT value for `position` (could be removed)'},
-        {reason: 'ERROR: property value `` is not supported for `position` (supported values are: `relative`|`absolute`|`sticky`|`fixed`)'}
+        {reason: 'NOTE: property value `#F00` is autofixed to `#FF0000`'},
+        {reason: 'NOTE: property value `#f00` is autofixed to `#ff0000`'},
+        {reason: 'NOTE: property value `red` is autofixed to `#FF0000`'},
+        {reason: 'NOTE: property value `lightpink` is autofixed to `#FFB6C1`'},
+        {reason: 'ERROR: property value `asdf` is not valid for `background-color`'},
+        {reason: 'ERROR: property value `rgb(266,0,255)` is not valid for `color`'},
+        {reason: 'ERROR: property value `rgba(234,45,99,1.3)` is not valid for `background-color`'}
+      ])
+      done()
+    })
+  })
+
+  it('parse flex-wrap', function (done) {
+    var code = {
+      foo: { flexWrap: 'nowrap' },
+      bar: { flexWrap: 'wrap' }
+    }
+    styler.validate(code, function (err, data) {
+      expect(err).is.undefined
+      expect(data).is.an.object
+      expect(data.jsonStyle).eql({
+        foo: { flexWrap: 'nowrap' },
+        bar: { flexWrap: 'wrap' }
+      })
+      expect(data.log).eql([
+        {reason: 'NOTE: property value `nowrap` is the DEFAULT value for `flex-wrap` (could be removed)'},
+        {reason: 'NOTE: the flex-wrap property may have compatibility problem on native'},
       ])
       done()
     })
