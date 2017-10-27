@@ -13,13 +13,11 @@ describe('parse', function () {
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({foo: {color: '#FF0000', backgroundColor: 'rgba(255,255,255,0.6)', WebkitTransform: 'rotate(90deg)', width: 200, left: 0, right: 0, borderWidth: '1pt', fontWeight: '100'}, bar: {background: 'red'}})
+      expect(data.jsonStyle).eql({foo: {color: '#FF0000', backgroundColor: 'rgba(255,255,255,0.6)', WebkitTransform: 'rotate(90deg)', width: '200px', left: 0, right: '0px', borderWidth: '1pt', fontWeight: '100'}, bar: {background: 'red'}})
       expect(data.log).eql([
         {line: 1, column: 1, reason: 'ERROR: Selector `html` is not supported. Weex only support single-classname selector'},
         {line: 3, column: 7, reason: 'NOTE: property value `red` is autofixed to `#FF0000`'},
         {line: 3, column: 60, reason: 'WARNING: `-webkit-transform` is not a standard property name (may not be supported)'},
-        {line: 3, column: 94, reason: 'NOTE: unit `px` is not supported and property value `200px` is autofixed to `200`'},
-        {line: 3, column: 117, reason: 'NOTE: unit `px` is not supported and property value `0px` is autofixed to `0`'},
         {line: 5, column: 7, reason: 'WARNING: `background` is not a standard property name (may not be supported), suggest `background-color`'}
       ])
       done()
@@ -31,7 +29,7 @@ describe('parse', function () {
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({foo: {fontSize: 200}})
+      expect(data.jsonStyle).eql({foo: {fontSize: '200px'}})
       done()
     })
   })
@@ -41,7 +39,7 @@ describe('parse', function () {
     styler.parse(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({foo: {lineHeight: 40}, bar: {lineHeight: 20}})
+      expect(data.jsonStyle).eql({foo: {lineHeight: 40}, bar: {lineHeight: '20px'}})
       done()
     })
   })
@@ -200,21 +198,21 @@ describe('parse', function () {
       expect(err).is.undefined
       expect(data).is.an.object
       expect(data.jsonStyle.foo).eql({
-        paddingTop: 20,
-        paddingRight: 20,
-        paddingBottom: 20,
-        paddingLeft: 20,
-        marginTop: 30,
+        paddingTop: '20px',
+        paddingRight: '20px',
+        paddingBottom: '20px',
+        paddingLeft: '20px',
+        marginTop: '30px',
         marginRight: 40,
-        marginBottom: 30,
+        marginBottom: '30px',
         marginLeft: 40
       })
       expect(data.jsonStyle.bar).eql({
         paddingTop: 10,
-        paddingRight: 20,
-        paddingBottom: 30,
+        paddingRight: '20px',
+        paddingBottom: '30px',
         paddingLeft: 40,
-        marginTop: 10,
+        marginTop: '10px',
         marginRight: 20,
         marginBottom: 30,
         marginLeft: 20
@@ -229,15 +227,15 @@ describe('parse', function () {
       expect(err).is.undefined
       expect(data).is.an.object
       expect(data.jsonStyle.foo).eql({
-        paddingTop: 20,
-        paddingRight: 20,
-        paddingBottom: 20,
-        paddingLeft: 30
+        paddingTop: '20px',
+        paddingRight: '20px',
+        paddingBottom: '20px',
+        paddingLeft: '30px'
       })
       expect(data.jsonStyle.bar).eql({
-        marginTop: 10,
+        marginTop: '10px',
         marginRight: 20,
-        marginBottom: 30,
+        marginBottom: '30px',
         marginLeft: 20
       })
       done()

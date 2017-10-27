@@ -41,15 +41,13 @@ describe('validate', function () {
       expect(err).is.undefined
       expect(data).is.an.object
       expect(data.jsonStyle).eql({foo: {
-        width: 200,
+        width: '200px',
         paddingLeft: 300,
         borderWidth: '1pt',
         left: 0,
-        right: 0
+        right: '0px'
       }})
       expect(data.log).eql([
-        {reason: 'NOTE: unit `px` is not supported and property value `200px` is autofixed to `200`'},
-        {reason: 'NOTE: unit `px` is not supported and property value `0px` is autofixed to `0`'},
         {reason: 'ERROR: property value `asdf` is not supported for `margin-right` (only number and pixel values are supported)'}
       ])
       done()
@@ -407,7 +405,7 @@ describe('validate', function () {
         foo: {
           background: '#ff0000',
           abc: 123,
-          def: 456,
+          def: '456px',
           ghi: '789pt',
           AbcDef: 456,
           abcDef: 'abc'
@@ -436,11 +434,10 @@ describe('validate', function () {
     styler.validate(code, function (err, data) {
       expect(err).is.undefined
       expect(data).is.an.object
-      expect(data.jsonStyle).eql({foo: {color: '#FF0000', WebkitTransform: 'rotate(90deg)', width: 200}})
+      expect(data.jsonStyle).eql({foo: {color: '#FF0000', WebkitTransform: 'rotate(90deg)', width: '200px'}})
       expect(data.log).eql([
         {reason: 'NOTE: property value `red` is autofixed to `#FF0000`'},
-        {reason: 'WARNING: `-webkit-transform` is not a standard property name (may not be supported)'},
-        {reason: 'NOTE: unit `px` is not supported and property value `200px` is autofixed to `200`'}
+        {reason: 'WARNING: `-webkit-transform` is not a standard property name (may not be supported)'}
       ])
       done()
     })
